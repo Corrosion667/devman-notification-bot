@@ -15,3 +15,19 @@
 - Link to the lesson;
 - Status message about success or failure.
 
+## Running
+
+The easiest way to run this bot is to use official ***Docker image***.  
+You only need to create **.env** file and set the <ins>following environmental variables</ins> *(as in the .env(example) file)*.  
+
+| Environmental    | Description                                           |
+|------------------|-------------------------------------------------------|
+| `DEVMAN_TOKEN`   | personal student token from *dvmn.org* to use its API |       
+| `TELEGRAM_TOKEN` | bot token from @BotFather in telegram                 |      
+| `CHAT_ID`        | your id from @userinfobot                             |
+| `USERNAME`       | your name                                             |
+
+Run bot in container with the following command:
+```bash
+docker run -d --env-file .env corrosion667/devman-notification-bot
+```
