@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "devman-notification-bot"
 version = "0.1.0"
-description = ""
+description = "Bot for sending telegram notifications about Devman lessons checking"
 authors = ["Artem Nechai <lenikol95@mail.ru>"]
 
 [tool.poetry.dependencies]
