@@ -16,5 +16,5 @@ jobs:
       - name: updating dpendencies and do linter check
         run: |
           pip install poetry
-          make install
-          make lint
+          poetry install
+          poetry run flake8 bot
