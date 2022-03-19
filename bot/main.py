@@ -16,7 +16,7 @@ USERNAME = os.getenv('USERNAME', 'friend')
 CHAT_ID = os.getenv('CHAT_ID')
 
 LONG_POLLING_URL = 'https://dvmn.org/api/long_polling/'
-LONG_POLLING_TIMEOUT = 120
+LONG_POLLING_TIMEOUT = 90
 
 NOTIFICATION = 'Dear {user}! Your work «{title}» has been checked!\n{link}\n\n{result}'
 POSITIVE_RESULT = 'Everything is great, you can get to the next lesson!'
@@ -27,7 +27,7 @@ class DevmanBot(object):
     """Class for devman notification bot."""
 
     def __init__(self):
-        """Initiate bot instance with url for requests and auth devman token."""
+        """Initiate bot instance."""
         self.headers = {
             'Authorization': f'Token {DEVMAN_TOKEN}',
         }
