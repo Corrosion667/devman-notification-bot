@@ -3,6 +3,9 @@ name = "devman-notification-bot"
 version = "0.1.0"
 description = "Bot for sending telegram notifications about Devman lessons checking"
 authors = ["Artem Nechai <lenikol95@mail.ru>"]
+packages = [
+  { include = "bot" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
