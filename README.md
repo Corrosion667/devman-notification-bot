@@ -15,6 +15,8 @@
 - Link to the lesson;
 - Status message about success or failure.
 
+Bot will also send you notification if there is any problems with Devman Api.
+
 ## Running
 
 The easiest way to run this bot is to use official ***Docker image***.  
