@@ -40,8 +40,9 @@ class DevmanBot(object):
             chat_id=TELEGRAM_CHAT_ID,
             text=f'Hello, {USERNAME}!',
         )
-        request_time = str(time.time())
+        request_time = time.time()
         while True:
+            print(request_time)
             timestamp_data = {'timestamp': request_time}
             try:
                 response = requests.get(
