@@ -6,7 +6,7 @@ import time
 import requests
 import telegram
 from dotenv import load_dotenv
-from requests.exceptions import ConnectionError, ReadTimeout
+from requests.exceptions import ConnectionError, HTTPError, ReadTimeout
 
 load_dotenv()
 
@@ -18,8 +18,10 @@ TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 LONG_POLLING_URL = 'https://dvmn.org/api/long_polling/'
 LONG_POLLING_TIMEOUT = 90
 CONNECTION_LOST_TIMEOUT = 60
+HTTP_ERROR_TIMEOUT = 100
+HTTP_ERROR_NOTIFICATION = '{exception}\nError with Devman Api, retrying in {timeout} seconds.'
 
-NOTIFICATION = 'Dear {user}! Your work «{title}» has been checked!\n{link}\n\n{result}'
+REVIEW_NOTIFICATION = 'Dear {user}! Your work «{title}» has been checked!\n{link}\n\n{result}'
 POSITIVE_RESULT = 'Everything is great, you can get to the next lesson!'
 NEGATIVE_RESULT = 'Unfortunately, some mistakes have been found in your task. Please try again.'
 
@@ -43,7 +45,6 @@ class DevmanBot(object):
         )
         request_time = time.time()
         while True:
-            print(request_time)
             timestamp_data = {'timestamp': request_time}
             try:
                 response = requests.get(
@@ -51,17 +52,27 @@ class DevmanBot(object):
                     timeout=LONG_POLLING_TIMEOUT,
                     headers=self.headers,
                     params=timestamp_data,
-                ).json()
+                )
             except ReadTimeout:
                 continue
             except ConnectionError:
                 time.sleep(CONNECTION_LOST_TIMEOUT)
                 continue
-            if response.get('status') == 'timeout':
-                request_time = response.get('timestamp_to_request')
+            try:
+                response.raise_for_status()
+            except HTTPError as exc:
+                self.bot.send_message(
+                    chat_id=TELEGRAM_CHAT_ID,
+                    text=HTTP_ERROR_NOTIFICATION.format(exception=exc, timeout=HTTP_ERROR_TIMEOUT),
+                )
+                time.sleep(HTTP_ERROR_TIMEOUT)
                 continue
-            request_time = response.get('last_attempt_timestamp')
-            self.send_notification(response)
+            decoded_response = response.json()
+            if decoded_response.get('status') == 'timeout':
+                request_time = decoded_response.get('timestamp_to_request')
+                continue
+            request_time = decoded_response.get('last_attempt_timestamp')
+            self.send_notification(decoded_response)
 
     def send_notification(self, response):
         """Send notification to user depending on Api Devman response.
@@ -73,7 +84,7 @@ class DevmanBot(object):
         is_work_failed = work_information.get('is_negative')
         lesson_title = work_information.get('lesson_title')
         lesson_url = work_information.get('lesson_url')
-        notification = NOTIFICATION.format(
+        notification = REVIEW_NOTIFICATION.format(
             user=USERNAME,
             title=lesson_title,
             link=lesson_url,
