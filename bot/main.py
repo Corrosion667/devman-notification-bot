@@ -17,6 +17,7 @@ TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 LONG_POLLING_URL = 'https://dvmn.org/api/long_polling/'
 LONG_POLLING_TIMEOUT = 90
+CONNECTION_LOST_TIMEOUT = 60
 
 NOTIFICATION = 'Dear {user}! Your work «{title}» has been checked!\n{link}\n\n{result}'
 POSITIVE_RESULT = 'Everything is great, you can get to the next lesson!'
@@ -51,7 +52,10 @@ class DevmanBot(object):
                     headers=self.headers,
                     params=timestamp_data,
                 ).json()
-            except (ConnectionError, ReadTimeout):
+            except ReadTimeout:
+                continue
+            except ConnectionError:
+                time.sleep(CONNECTION_LOST_TIMEOUT)
                 continue
             if response.get('status') == 'timeout':
                 request_time = response.get('timestamp_to_request')
