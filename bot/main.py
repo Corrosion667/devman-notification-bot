@@ -13,7 +13,7 @@ load_dotenv()
 DEVMAN_TOKEN = os.getenv('DEVMAN_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 USERNAME = os.getenv('USERNAME', 'friend')
-CHAT_ID = os.getenv('CHAT_ID')
+TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 LONG_POLLING_URL = 'https://dvmn.org/api/long_polling/'
 LONG_POLLING_TIMEOUT = 90
@@ -37,7 +37,7 @@ class DevmanBot(object):
     def start(self):
         """Start the bot."""
         self.bot.send_message(
-            chat_id=CHAT_ID,
+            chat_id=TELEGRAM_CHAT_ID,
             text=f'Hello, {USERNAME}!',
         )
         request_time = str(time.time())
@@ -75,7 +75,7 @@ class DevmanBot(object):
             result=NEGATIVE_RESULT if is_work_failed else POSITIVE_RESULT,
         )
         self.bot.send_message(
-            chat_id=CHAT_ID,
+            chat_id=TELEGRAM_CHAT_ID,
             text=notification,
         )
 
