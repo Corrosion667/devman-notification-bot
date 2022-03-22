@@ -55,13 +55,12 @@ class DevmanBot(object):
                     headers=self.headers,
                     params=timestamp_data,
                 )
+                response.raise_for_status()
             except ReadTimeout:
                 continue
             except ConnectionError:
                 time.sleep(CONNECTION_LOST_TIMEOUT)
                 continue
-            try:
-                response.raise_for_status()
             except HTTPError as exc:
                 self.bot.send_message(
                     chat_id=self.telegram_chat_id,
@@ -69,20 +68,20 @@ class DevmanBot(object):
                 )
                 time.sleep(HTTP_ERROR_TIMEOUT)
                 continue
-            decoded_response = response.json()
-            if decoded_response.get('status') == 'timeout':
-                request_time = decoded_response.get('timestamp_to_request')
+            reviews_data = response.json()
+            if reviews_data.get('status') == 'timeout':
+                request_time = reviews_data.get('timestamp_to_request')
                 continue
-            request_time = decoded_response.get('last_attempt_timestamp')
-            self.send_notification(decoded_response)
+            request_time = reviews_data.get('last_attempt_timestamp')
+            self.send_notification(reviews_data)
 
-    def send_notification(self, response):
-        """Send notification to user depending on Api Devman response.
+    def send_notification(self, reviews_data):
+        """Send notification to user depending on Api Devman response with lessons reviews.
 
         Args:
-            response: Api Devman information about lesson checking.
+            reviews_data: Api Devman information about lesson checking.
         """
-        work_information = response.get('new_attempts')[0]
+        work_information = reviews_data.get('new_attempts')[0]
         is_work_failed = work_information.get('is_negative')
         lesson_title = work_information.get('lesson_title')
         lesson_url = work_information.get('lesson_url')
