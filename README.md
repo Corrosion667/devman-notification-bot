@@ -33,3 +33,25 @@ Run bot in container with the following command:
 ```bash
 docker run -d --env-file .env corrosion667/devman-notification-bot
 ```
+&nbsp;
+#### *Alternative running method*
+
+If you do not have docker, you can use this workflow:
+1. clone the repository:
+```bash
+git clone https://github.com/Corrosion667/devman-notification-bot.git
+```
+2. Create **.env** file
+3. Install dependencies (note that *poetry* will also be installed into your user's environment).
+```bash
+make install
+```
+* Please take note that it requieres *poetry*. If you do not have it yet, run:
+```bash
+make full-install
+```
+* So that *poetry* will also be installed into your user's environment before project dependencies.
+4. Run the bot:
+```bash
+make run
+```
