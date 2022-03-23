@@ -49,7 +49,7 @@ class DevmanBot(object):
             chat_id=self.telegram_chat_id,
             text=f'Hello, {self.username}!',
         )
-        logging.info('Bot has started')
+        logger.info('Bot has started')
         request_time = time.time()
         while True:
             timestamp_data = {'timestamp': request_time}
