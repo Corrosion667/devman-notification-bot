@@ -27,26 +27,26 @@ logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s')
 class DevmanBot(object):
     """Class for devman notification bot."""
 
-    def __init__(self, devman_token, telegram_token, telegram_chat_id, username):
-        """Initiate bot instance.
+    def __init__(self, devman_token, tg_bot, telegram_chat_id, username):
+        """Initiate notification bot instance.
 
         Args:
             devman_token: personal student token from *dvmn.org* to use its API.
-            telegram_token: bot token from @BotFather in telegram.
+            tg_bot: instance of telegram bot.
             telegram_chat_id: id of a person from @userinfobot.
             username: the name with which the bot will address the userю
         """
         self.headers = {
             'Authorization': f'Token {devman_token}',
         }
-        self.bot = telegram.Bot(token=telegram_token)
+        self.tg_bot = tg_bot
         self.telegram_chat_id = telegram_chat_id
         self.username = username
         self.url = LONG_POLLING_URL
 
     def start(self):
         """Start the bot."""
-        self.bot.send_message(
+        self.tg_bot.send_message(
             chat_id=self.telegram_chat_id,
             text=f'Hello, {self.username}!',
         )
@@ -76,7 +76,7 @@ class DevmanBot(object):
                     exception=exc, timeout=HTTP_ERROR_TIMEOUT,
                 )
                 logger.error(error_message)
-                self.bot.send_message(
+                self.tg_bot.send_message(
                     chat_id=self.telegram_chat_id,
                     text=error_message,
                 )
@@ -107,26 +107,27 @@ class DevmanBot(object):
             result=NEGATIVE_RESULT if is_work_failed else POSITIVE_RESULT,
         )
         logger.info('New data about lesson checking found! Sending message.')
-        self.bot.send_message(
+        self.tg_bot.send_message(
             chat_id=self.telegram_chat_id,
             text=notification,
         )
 
 
 def main():
-    """Execute bot as a script."""
+    """Execute notification bot as a script."""
     load_dotenv()
     devman_token = os.getenv('DEVMAN_TOKEN')
     telegram_token = os.getenv('TELEGRAM_TOKEN')
     telegram_chat_id = os.getenv('TELEGRAM_CHAT_ID')
     username = os.getenv('USERNAME', 'friend')
-    bot = DevmanBot(
+    telegram_bot = telegram.Bot(token=telegram_token)
+    notification_bot = DevmanBot(
         devman_token,
-        telegram_token,
+        telegram_bot,
         telegram_chat_id,
         username,
     )
-    bot.start()
+    notification_bot.start()
 
 
 if __name__ == '__main__':
