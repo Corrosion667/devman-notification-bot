@@ -15,6 +15,5 @@ jobs:
       - uses: actions/setup-python@v2
       - name: updating dpendencies and do linter check
         run: |
-          pip install poetry
-          poetry install
-
+          make full-install
+          make lint
