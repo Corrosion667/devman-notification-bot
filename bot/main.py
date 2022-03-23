@@ -60,6 +60,7 @@ class DevmanBot(object):
                 error_message = HTTP_ERROR_LOG.format(
                     exception=exc, timeout=60,
                 )
+                logger.info("GOTCHA STREAM HANDLER\nCHEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEECK")
                 logger.error(error_message)
                 time.sleep(60)
                 continue
