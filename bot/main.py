@@ -3,6 +3,7 @@
 import os
 import time
 
+import logging
 import requests
 import telegram
 from dotenv import load_dotenv
@@ -17,6 +18,10 @@ HTTP_ERROR_NOTIFICATION = '{exception}\nError with Devman Api, retrying in {time
 REVIEW_NOTIFICATION = 'Dear {user}! Your work «{title}» has been checked!\n{link}\n\n{result}'
 POSITIVE_RESULT = 'Everything is great, you can get to the next lesson!'
 NEGATIVE_RESULT = 'Unfortunately, some mistakes have been found in your task. Please try again.'
+
+logger = logging.getLogger('devman_bot')
+logger.setLevel(logging.INFO)
+logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s)')
 
 
 class DevmanBot(object):
@@ -45,6 +50,7 @@ class DevmanBot(object):
             chat_id=self.telegram_chat_id,
             text=f'Hello, {self.username}!',
         )
+        logger.info('Bot has started')
         request_time = time.time()
         while True:
             timestamp_data = {'timestamp': request_time}
@@ -57,20 +63,29 @@ class DevmanBot(object):
                 )
                 response.raise_for_status()
             except ReadTimeout:
+                logger.info('No new information from Api Devman received.')
                 continue
             except ConnectionError:
+                logger.warning(
+                    f'Connection lost! Retrying in {CONNECTION_LOST_TIMEOUT} seconds.'
+                )
                 time.sleep(CONNECTION_LOST_TIMEOUT)
                 continue
             except HTTPError as exc:
+                error_message = HTTP_ERROR_NOTIFICATION.format(
+                    exception=exc, timeout=HTTP_ERROR_TIMEOUT,
+                )
+                logger.error(error_message)
                 self.bot.send_message(
                     chat_id=self.telegram_chat_id,
-                    text=HTTP_ERROR_NOTIFICATION.format(exception=exc, timeout=HTTP_ERROR_TIMEOUT),
+                    text=error_message,
                 )
                 time.sleep(HTTP_ERROR_TIMEOUT)
                 continue
             reviews_data = response.json()
             if reviews_data.get('status') == 'timeout':
                 request_time = reviews_data.get('timestamp_to_request')
+                logger.info('No new information from Api Devman received.')
                 continue
             request_time = reviews_data.get('last_attempt_timestamp')
             self.send_notification(reviews_data)
@@ -91,6 +106,7 @@ class DevmanBot(object):
             link=lesson_url,
             result=NEGATIVE_RESULT if is_work_failed else POSITIVE_RESULT,
         )
+        logger.info('New data about lesson checking found! Sending message.')
         self.bot.send_message(
             chat_id=self.telegram_chat_id,
             text=notification,
