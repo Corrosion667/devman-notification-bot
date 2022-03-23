@@ -58,11 +58,10 @@ class DevmanBot(object):
                 a = 1 // 0
             except Exception as exc:
                 error_message = HTTP_ERROR_LOG.format(
-                    exception=exc, timeout=30,
+                    exception=exc, timeout=60,
                 )
-                logger.info(error_message)
                 logger.error(error_message)
-                time.sleep(30)
+                time.sleep(60)
                 continue
             try:
                 response = requests.get(
