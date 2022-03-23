@@ -21,7 +21,7 @@ NEGATIVE_RESULT = 'Unfortunately, some mistakes have been found in your task. Pl
 
 logger = logging.getLogger('devman_bot')
 logger.setLevel(logging.INFO)
-logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s)')
+logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s')
 
 
 class DevmanBot(object):
