@@ -6,7 +6,7 @@ import time
 
 import requests
 import telegram
-from bot_logging import prepare_log_handlers
+from bot.bot_logging import prepare_log_handlers
 from dotenv import load_dotenv
 from requests.exceptions import ConnectionError, HTTPError, ReadTimeout
 
