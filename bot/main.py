@@ -6,8 +6,8 @@ import time
 
 import requests
 import telegram
+from bot_logging import prepare_log_handlers
 from dotenv import load_dotenv
-from logs_handler import TelegramLogsHandler
 from requests.exceptions import ConnectionError, HTTPError, ReadTimeout
 
 LONG_POLLING_URL = 'https://dvmn.org/api/long_polling/'
@@ -117,16 +117,7 @@ def main():
     telegram_chat_id = os.getenv('TELEGRAM_CHAT_ID')
     username = os.getenv('USERNAME', 'friend')
     telegram_bot = telegram.Bot(token=telegram_token)
-
-    log_formatter = logging.Formatter(
-        '%(asctime)s %(levelname)s: %(message)s',
-    )
-    logger.setLevel(logging.INFO)
-
-    tg_logs_handler = TelegramLogsHandler(telegram_bot, telegram_chat_id)
-    tg_logs_handler.setLevel(logging.ERROR)
-    tg_logs_handler.setFormatter(log_formatter)
-
+    prepare_log_handlers(telegram_bot, telegram_chat_id)
     notification_bot = DevmanBot(
         devman_token,
         telegram_bot,
