@@ -45,4 +45,3 @@ def prepare_log_handlers(telegram_bot, telegram_chat_id):
     tg_logs_handler.setLevel(logging.ERROR)
     tg_logs_handler.setFormatter(log_formatter)
     logger.addHandler(stream_handler)
-    # logger.addHandler(tg_logs_handler)
