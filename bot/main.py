@@ -1,9 +1,9 @@
 """This is a bot for checking devman lessons status."""
 
+import logging
 import os
 import time
 
-import logging
 import requests
 import telegram
 from dotenv import load_dotenv
@@ -67,7 +67,7 @@ class DevmanBot(object):
                 continue
             except ConnectionError:
                 logger.warning(
-                    f'Connection lost! Retrying in {CONNECTION_LOST_TIMEOUT} seconds.'
+                    f'Connection lost! Retrying in {CONNECTION_LOST_TIMEOUT} seconds.',
                 )
                 time.sleep(CONNECTION_LOST_TIMEOUT)
                 continue
