@@ -41,7 +41,7 @@ If you do not have docker, you can use this workflow:
 ```bash
 git clone https://github.com/Corrosion667/devman-notification-bot.git
 ```
-2. Create **.env** file
+2. Create **.env** file and set the <ins>environmental variables</ins> as described above.
 3. Install dependencies (note that *poetry* will also be installed into your user's environment).
 ```bash
 make install
@@ -50,7 +50,7 @@ make install
 ```bash
 make full-install
 ```
-* So that *poetry* will also be installed into your user's environment before project dependencies.
+* So that *poetry* will also be installed into your user's environment with project dependencies.
 4. Run the bot:
 ```bash
 make run
