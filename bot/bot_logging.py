@@ -38,6 +38,7 @@ def prepare_log_handlers(telegram_bot, telegram_chat_id):
     log_formatter = logging.Formatter(
         '%(asctime)s %(levelname)s: %(message)s',
     )
+    logger.setLevel(logging.INFO)
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.INFO)
     stream_handler.setFormatter(log_formatter)

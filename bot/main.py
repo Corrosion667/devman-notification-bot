@@ -20,6 +20,8 @@ REVIEW_NOTIFICATION = 'Dear {user}! Your work «{title}» has been checked!\n{li
 POSITIVE_RESULT = 'Everything is great, you can get to the next lesson!'
 NEGATIVE_RESULT = 'Unfortunately, some mistakes have been found in your task. Please try again.'
 
+logger = logging.getLogger('devman_notification_bot')
+
 
 class DevmanBot(object):
     """Class for devman notification bot."""
@@ -60,11 +62,11 @@ class DevmanBot(object):
                 )
                 response.raise_for_status()
             except ReadTimeout:
-                logging.info('No new information from Api Devman received.')
-                logging.error('CHECK_TG_LOGGER')
+                logger.info('No new information from Api Devman received.')
+                logger.error('CHECK_TG_LOGGER')
                 continue
             except ConnectionError:
-                logging.warning(
+                logger.warning(
                     f'Connection lost! Retrying in {CONNECTION_LOST_TIMEOUT} seconds.',
                 )
                 time.sleep(CONNECTION_LOST_TIMEOUT)
@@ -73,13 +75,13 @@ class DevmanBot(object):
                 error_message = HTTP_ERROR_NOTIFICATION.format(
                     exception=exc, timeout=HTTP_ERROR_TIMEOUT,
                 )
-                logging.error(error_message)
+                logger.error(error_message)
                 time.sleep(HTTP_ERROR_TIMEOUT)
                 continue
             reviews_data = response.json()
             if reviews_data.get('status') == 'timeout':
                 request_time = reviews_data.get('timestamp_to_request')
-                logging.info('No new information from Api Devman received.')
+                logger.info('No new information from Api Devman received.')
                 continue
             request_time = reviews_data.get('last_attempt_timestamp')
             self.send_notification(reviews_data)
@@ -100,7 +102,7 @@ class DevmanBot(object):
             link=lesson_url,
             result=NEGATIVE_RESULT if is_work_failed else POSITIVE_RESULT,
         )
-        logging.info('New data about lesson checking found! Sending message.')
+        logger.info('New data about lesson checking found! Sending message.')
         self.tg_bot.send_message(
             chat_id=self.telegram_chat_id,
             text=notification,
