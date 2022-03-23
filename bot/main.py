@@ -6,9 +6,10 @@ import time
 
 import requests
 import telegram
-from bot.bot_logging import prepare_log_handlers
 from dotenv import load_dotenv
 from requests.exceptions import ConnectionError, HTTPError, ReadTimeout
+
+from bot.bot_logging import prepare_log_handlers
 
 LONG_POLLING_URL = 'https://dvmn.org/api/long_polling/'
 LONG_POLLING_TIMEOUT = 90
