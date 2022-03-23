@@ -51,7 +51,7 @@ class DevmanBot(object):
     def start(self):
         """Start the bot."""
         logger.info(START_LOG)
-        self.tg_bot.send_message(
+        self.telegram_bot.send_message(
             chat_id=self.telegram_chat_id,
             text=f'Hello, {self.username}!',
         )
