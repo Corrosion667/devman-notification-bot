@@ -1,9 +1,9 @@
 install:
-	poetry install
+	poetry install --no-root
 
 full-install:
 	pip3 install --user poetry
-	poetry install
+	poetry install --no-root
 
 run:
 	poetry run bot

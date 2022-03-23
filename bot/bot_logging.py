@@ -2,8 +2,6 @@
 
 import logging
 
-logger = logging.getLogger('devman_notification_bot')
-
 
 class TelegramLogsHandler(logging.Handler):
     """Class for handler of logs to send them to TG."""
@@ -29,10 +27,11 @@ class TelegramLogsHandler(logging.Handler):
         self.tg_bot.send_message(chat_id=self.telegram_chat_id, text=log_entry)
 
 
-def prepare_log_handlers(telegram_bot, telegram_chat_id):
+def prepare_log_handlers(logger, telegram_bot, telegram_chat_id):
     """Create two handlers: general and telegram handler for errors only.
 
     Args:
+        logger: logger instance to be configured.
         telegram_bot: instance of telegram bot.
         telegram_chat_id: id of a person from @userinfobot.
     """

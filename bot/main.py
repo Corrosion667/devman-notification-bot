@@ -120,7 +120,7 @@ def main():
     telegram_chat_id = os.getenv('TELEGRAM_CHAT_ID')
     username = os.getenv('USERNAME', 'friend')
     telegram_bot = telegram.Bot(token=telegram_token)
-    prepare_log_handlers(telegram_bot, telegram_chat_id)
+    prepare_log_handlers(logger, telegram_bot, telegram_chat_id)
     notification_bot = DevmanBot(
         devman_token,
         telegram_bot,
