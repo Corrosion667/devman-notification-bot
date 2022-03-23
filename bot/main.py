@@ -7,6 +7,7 @@ import time
 import requests
 import telegram
 from dotenv import load_dotenv
+from logs_handler import TelegramLogsHandler
 from requests.exceptions import ConnectionError, HTTPError, ReadTimeout
 
 LONG_POLLING_URL = 'https://dvmn.org/api/long_polling/'
@@ -19,9 +20,7 @@ REVIEW_NOTIFICATION = 'Dear {user}! Your work «{title}» has been checked!\n{li
 POSITIVE_RESULT = 'Everything is great, you can get to the next lesson!'
 NEGATIVE_RESULT = 'Unfortunately, some mistakes have been found in your task. Please try again.'
 
-logger = logging.getLogger('devman_bot')
-logger.setLevel(logging.INFO)
-logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s')
+logger = logging.getLogger('devman_notification_bot')
 
 
 class DevmanBot(object):
@@ -76,10 +75,6 @@ class DevmanBot(object):
                     exception=exc, timeout=HTTP_ERROR_TIMEOUT,
                 )
                 logger.error(error_message)
-                self.tg_bot.send_message(
-                    chat_id=self.telegram_chat_id,
-                    text=error_message,
-                )
                 time.sleep(HTTP_ERROR_TIMEOUT)
                 continue
             reviews_data = response.json()
@@ -121,6 +116,16 @@ def main():
     telegram_chat_id = os.getenv('TELEGRAM_CHAT_ID')
     username = os.getenv('USERNAME', 'friend')
     telegram_bot = telegram.Bot(token=telegram_token)
+
+    log_formatter = logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s',
+    )
+    logger.setLevel(logging.INFO)
+
+    tg_logs_handler = TelegramLogsHandler(telegram_bot, telegram_chat_id)
+    tg_logs_handler.setLevel(logging.ERROR)
+    tg_logs_handler.setFormatter(log_formatter)
+
     notification_bot = DevmanBot(
         devman_token,
         telegram_bot,
