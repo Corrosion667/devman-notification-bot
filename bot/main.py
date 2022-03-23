@@ -31,19 +31,19 @@ logger = logging.getLogger('devman_notification_bot')
 class DevmanBot(object):
     """Class for devman notification bot."""
 
-    def __init__(self, devman_token, tg_bot, telegram_chat_id, username):
+    def __init__(self, devman_token, telegram_bot, telegram_chat_id, username):
         """Initiate notification bot instance.
 
         Args:
             devman_token: personal student token from *dvmn.org* to use its API.
-            tg_bot: instance of telegram bot.
+            telegram_bot: instance of telegram bot.
             telegram_chat_id: id of a person from @userinfobot.
             username: the name with which the bot will address the userю
         """
         self.headers = {
             'Authorization': f'Token {devman_token}',
         }
-        self.tg_bot = tg_bot
+        self.telegram_bot = telegram_bot
         self.telegram_chat_id = telegram_chat_id
         self.username = username
         self.url = LONG_POLLING_URL
@@ -51,19 +51,13 @@ class DevmanBot(object):
     def start(self):
         """Start the bot."""
         logger.info(START_LOG)
+        self.tg_bot.send_message(
+            chat_id=self.telegram_chat_id,
+            text=f'Hello, {self.username}!',
+        )
         request_time = time.time()
         while True:
             timestamp_data = {'timestamp': request_time}
-            try:
-                a = 1 // 0
-            except Exception as exc:
-                error_message = HTTP_ERROR_LOG.format(
-                    exception=exc, timeout=60,
-                )
-                logger.info("GOTCHA STREAM HANDLER\nCHEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEECK")
-                logger.error(error_message)
-                time.sleep(60)
-                continue
             try:
                 response = requests.get(
                     self.url,
@@ -111,7 +105,7 @@ class DevmanBot(object):
             result=NEGATIVE_RESULT if is_work_failed else POSITIVE_RESULT,
         )
         logger.info(NEW_DATA_FOUND_LOG)
-        self.tg_bot.send_message(
+        self.telegram_bot.send_message(
             chat_id=self.telegram_chat_id,
             text=notification,
         )
