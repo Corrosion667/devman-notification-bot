@@ -11,10 +11,15 @@ from dotenv import load_dotenv
 from requests.exceptions import ConnectionError, HTTPError, ReadTimeout
 
 LONG_POLLING_URL = 'https://dvmn.org/api/long_polling/'
-LONG_POLLING_TIMEOUT = 10
+LONG_POLLING_TIMEOUT = 90
 CONNECTION_LOST_TIMEOUT = 60
 HTTP_ERROR_TIMEOUT = 100
-HTTP_ERROR_NOTIFICATION = '{exception}\nError with Devman Api, retrying in {timeout} seconds.'
+
+START_LOG = 'Bot has started.'
+NO_NEW_DATA_LOG = 'No new information from Api Devman received.'
+NEW_DATA_FOUND_LOG = 'New data about lesson checking found! Sending message.'
+CONNECTION_WARNING_LOG = f'Connection lost! Retrying in {CONNECTION_LOST_TIMEOUT} seconds.'
+HTTP_ERROR_LOG = '{exception}\nError with Devman Api, retrying in {timeout} seconds.'
 
 REVIEW_NOTIFICATION = 'Dear {user}! Your work «{title}» has been checked!\n{link}\n\n{result}'
 POSITIVE_RESULT = 'Everything is great, you can get to the next lesson!'
@@ -45,14 +50,20 @@ class DevmanBot(object):
 
     def start(self):
         """Start the bot."""
-        self.tg_bot.send_message(
-            chat_id=self.telegram_chat_id,
-            text=f'Hello, {self.username}!',
-        )
-        logger.info('Bot has started')
+        logger.info(START_LOG)
         request_time = time.time()
         while True:
             timestamp_data = {'timestamp': request_time}
+            try:
+                a = 1 // 0
+            except Exception as exc:
+                error_message = HTTP_ERROR_LOG.format(
+                    exception=exc, timeout=30,
+                )
+                logger.info(error_message)
+                logger.error(error_message)
+                time.sleep(30)
+                continue
             try:
                 response = requests.get(
                     self.url,
@@ -62,17 +73,14 @@ class DevmanBot(object):
                 )
                 response.raise_for_status()
             except ReadTimeout:
-                logger.info('No new information from Api Devman received.')
-                logger.error('CHECK_TG_LOGGER')
+                logger.info(NO_NEW_DATA_LOG)
                 continue
             except ConnectionError:
-                logger.warning(
-                    f'Connection lost! Retrying in {CONNECTION_LOST_TIMEOUT} seconds.',
-                )
+                logger.warning(CONNECTION_WARNING_LOG)
                 time.sleep(CONNECTION_LOST_TIMEOUT)
                 continue
             except HTTPError as exc:
-                error_message = HTTP_ERROR_NOTIFICATION.format(
+                error_message = HTTP_ERROR_LOG.format(
                     exception=exc, timeout=HTTP_ERROR_TIMEOUT,
                 )
                 logger.error(error_message)
@@ -81,7 +89,7 @@ class DevmanBot(object):
             reviews_data = response.json()
             if reviews_data.get('status') == 'timeout':
                 request_time = reviews_data.get('timestamp_to_request')
-                logger.info('No new information from Api Devman received.')
+                logger.info(NO_NEW_DATA_LOG)
                 continue
             request_time = reviews_data.get('last_attempt_timestamp')
             self.send_notification(reviews_data)
@@ -102,7 +110,7 @@ class DevmanBot(object):
             link=lesson_url,
             result=NEGATIVE_RESULT if is_work_failed else POSITIVE_RESULT,
         )
-        logger.info('New data about lesson checking found! Sending message.')
+        logger.info(NEW_DATA_FOUND_LOG)
         self.tg_bot.send_message(
             chat_id=self.telegram_chat_id,
             text=notification,
