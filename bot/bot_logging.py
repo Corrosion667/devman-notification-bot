@@ -2,8 +2,6 @@
 
 import logging
 
-logger = logging.getLogger('devman_notification_bot')
-
 
 class TelegramLogsHandler(logging.Handler):
     """Class for handler of logs to send them to TG."""
@@ -36,6 +34,7 @@ def prepare_log_handlers(telegram_bot, telegram_chat_id):
         telegram_bot: instance of telegram bot.
         telegram_chat_id: id of a person from @userinfobot.
     """
+    logger = logging.getLogger('devman_notification_bot')
     log_formatter = logging.Formatter(
         '%(asctime)s %(levelname)s: %(message)s',
     )
