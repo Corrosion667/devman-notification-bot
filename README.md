@@ -46,7 +46,7 @@ git clone https://github.com/Corrosion667/devman-notification-bot.git
 ```bash
 make install
 ```
-* Please take note that it requieres *poetry*. If you do not have it yet, run:
+* Please take note that it requires *poetry*. If you do not have it yet, run:
 ```bash
 make full-install
 ```
